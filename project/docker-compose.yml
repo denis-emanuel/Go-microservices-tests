@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  broker-service:
+    build:
+      context: ./../broker-service
+      dockerfile: ./../broker-service/broker-service.dockerfile
+    ports:
+      - "3001:8080"
+
+  authentication-service:
+    build:
+      context: ./../authentication-service
+      dockerfile: ./../authentication-service/authentication-service.dockerfile
+    ports:
+      - "3002:8080"
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+
+  postgres:
+    image: "postgres:14.2"
+    container_name: "postgres"
+    ports:
+      - "5432:5432"
+    user: "${UID}:${GID}"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+      # PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data
